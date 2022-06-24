@@ -1,13 +1,6 @@
 import * as React from "react";
-import { MoonIcon, SunIcon } from "@heroicons/react/outline";
-import type {
-  LinksFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
-  Link,
   Links,
   LiveReload,
   Meta,
@@ -16,142 +9,84 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import tailwindStylesheetUrl from "./styles/tailwind.css";
-import { getUser } from "./session.server";
+import { withEmotionCache } from "@emotion/react";
+import { ServerStyleContext, ClientStyleContext } from "@styles/styles-context";
+import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
+import theme from "@styles/theme";
+import Navbar from "@components/navbar";
 
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
+export let links: LinksFunction = () => {
+  return [
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    { rel: "preconnect", href: "https://fonts.gstatic.com" },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap",
+    },
+  ];
 };
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "Remix Notes",
+  title: "Software Pato Developer",
   viewport: "width=device-width,initial-scale=1",
 });
 
-export type ThemeMode = "light" | "dark";
-
-export type ThemeModeContextType = [
-  ThemeMode,
-  React.Dispatch<React.SetStateAction<ThemeMode>>
-];
-
-const ThemeModeContext = React.createContext<ThemeModeContextType>([
-  "light",
-  () => {},
-]);
-
-ThemeModeContext.displayName = "ThemeModeContext";
-
-const prefersLightMode = `(prefers-color-scheme: light)`;
-const getPreferredMode = (): ThemeMode =>
-  window.matchMedia(prefersLightMode).matches ? "light" : "dark";
-
-const ThemeModeProvider = ({
-  children,
-  initialThemeMode,
-}: {
+interface DocumentProps {
   children: React.ReactNode;
-  initialThemeMode?: ThemeMode;
-}) => {
-  const [themeMode, setThemeMode] = React.useState<ThemeMode>(() => {
-    if (initialThemeMode) {
-      return initialThemeMode;
-    }
+}
 
-    if (typeof window !== "object") {
-      return "light";
-    }
-    return initialThemeMode || getPreferredMode();
-  });
+const Document = withEmotionCache(
+  ({ children }: DocumentProps, emotionCache) => {
+    const serverStyleData = React.useContext(ServerStyleContext);
+    const clientStyleData = React.useContext(ClientStyleContext);
 
-  React.useEffect(() => {
-    const mediaQuery = window.matchMedia(prefersLightMode);
-    console.log(mediaQuery);
-    const handleChange = () => {
-      setThemeMode(mediaQuery.matches ? "light" : "dark");
-    };
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
+    // Only executed on client
+    React.useEffect(() => {
+      // re-link sheet container
+      emotionCache.sheet.container = document.head;
+      // re-inject tags
+      const tags = emotionCache.sheet.tags;
+      emotionCache.sheet.flush();
+      tags.forEach((tag) => {
+        (emotionCache.sheet as any)._insertTag(tag);
+      });
+      // reset cache to reapply global styles
+      clientStyleData?.reset();
+    }, []);
 
+    return (
+      <html lang="en">
+        <head>
+          <Meta />
+          <Links />
+          {serverStyleData?.map(({ key, ids, css }) => (
+            <style
+              key={key}
+              data-emotion={`${key} ${ids.join(" ")}`}
+              dangerouslySetInnerHTML={{ __html: css }}
+            />
+          ))}
+        </head>
+        <body>
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </body>
+      </html>
+    );
+  }
+);
+
+export default function App() {
   return (
-    <ThemeModeContext.Provider value={[themeMode, setThemeMode]}>
-      {children}
-    </ThemeModeContext.Provider>
-  );
-};
-
-const useThemeMode = () => React.useContext(ThemeModeContext);
-
-export const Navbar = () => {
-  const [_, setMode] = useThemeMode();
-  return (
-    <nav className="flex items-center justify-between border-b-[1px] border-b-orange-200 bg-slate-50 p-4 dark:bg-slate-700 dark:text-white">
-      <div className="typo">
-        <Link to=".">
-          <h4>
-            software<strong className="text-xl text-orange-500 ">pato</strong>
-            developer
-          </h4>
-        </Link>
-      </div>
-
-      <button
-        className="relative box-content h-8 w-8 items-center rounded-full border-[1px] border-slate-700 transition-colors dark:border-slate-100"
-        onClick={() => {
-          setMode((prevMode) => (prevMode === "dark" ? "light" : "dark"));
-        }}
-      >
-        <MoonIcon className="absolute top-0 left-0 w-8 stroke-slate-100 p-1 opacity-0 transition-opacity dark:opacity-100" />{" "}
-        <SunIcon className="absolute top-0 left-0 w-8 p-1 transition-opacity dark:stroke-slate-700 dark:opacity-0" />
-      </button>
-    </nav>
-  );
-};
-
-type LoaderData = {
-  user: Awaited<ReturnType<typeof getUser>>;
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  return json<LoaderData>({
-    user: await getUser(request),
-  });
-};
-
-export const Providers = ({
-  children,
-}: {
-  children?: React.ReactChildren | React.ReactChild;
-}) => {
-  return (
-    <ThemeModeProvider initialThemeMode="light">{children}</ThemeModeProvider>
-  );
-};
-
-export const AppMarkup = () => {
-  const [themeMode] = useThemeMode();
-  return (
-    <html lang="en" className={`h-full ${themeMode === "dark" ? "dark" : ""}`}>
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body className="h-full transition-colors dark:bg-slate-800">
+    <Document>
+      <ChakraProvider theme={theme}>
+        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <Navbar />
         <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
-  );
-};
-export default function AppWithProviders() {
-  return (
-    <Providers>
-      <AppMarkup />
-    </Providers>
+      </ChakraProvider>
+    </Document>
   );
 }
