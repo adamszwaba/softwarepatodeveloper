@@ -1,4 +1,4 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
 export interface ServerStyleContextData {
   key: string;
@@ -27,5 +27,5 @@ export interface ClientStyleContextData {
  * https://chakra-ui.com/getting-started/remix-guide#2-provider-setup
  */
 export const ClientStyleContext = createContext<ClientStyleContextData | null>(
-  null
+  null,
 );

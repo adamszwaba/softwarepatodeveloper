@@ -1,9 +1,9 @@
-import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import { json } from '@remix-run/node';
+import { Link, useLoaderData } from '@remix-run/react';
 
-import type * as MDX from "*.mdx";
+import type * as MDX from '*.mdx';
 
-import * as article1 from "./article1.mdx";
+import * as article1 from './article1.mdx';
 
 export type ArticleData = {
   title: string;
@@ -19,7 +19,7 @@ export type ArticlesLoaderReturnType = {
 
 export function extractDataFromModule(articleImport: typeof MDX): ArticleData {
   return {
-    slug: articleImport.filename.replace(/\.mdx$/, ""),
+    slug: articleImport.filename.replace(/\.mdx$/, ''),
     ...articleImport.attributes.meta,
   };
 }

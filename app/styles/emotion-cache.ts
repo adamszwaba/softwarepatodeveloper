@@ -1,4 +1,4 @@
-import createCache from "@emotion/cache";
+import createCache from '@emotion/cache';
 
 /**
  * Creates emotion cache to prevent styles loss on ssr content
@@ -7,5 +7,5 @@ import createCache from "@emotion/cache";
  * for detailed explanation
  */
 export default function createEmotionCache() {
-  return createCache({ key: "css" });
+  return createCache({ key: 'css' });
 }

@@ -1,5 +1,5 @@
-import * as React from "react";
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import * as React from 'react';
+import type { LinksFunction, MetaFunction } from '@remix-run/node';
 import {
   Links,
   LiveReload,
@@ -7,29 +7,29 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
+} from '@remix-run/react';
 
-import { withEmotionCache } from "@emotion/react";
-import { ServerStyleContext, ClientStyleContext } from "@styles/styles-context";
-import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
-import theme from "@styles/theme";
-import Navbar from "@components/navbar";
+import { withEmotionCache } from '@emotion/react';
+import { ServerStyleContext, ClientStyleContext } from '@styles/styles-context';
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import theme from '@styles/theme';
+import Navbar from '@components/navbar';
 
 export let links: LinksFunction = () => {
   return [
-    { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    { rel: "preconnect", href: "https://fonts.gstatic.com" },
+    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+    { rel: 'preconnect', href: 'https://fonts.gstatic.com' },
     {
-      rel: "stylesheet",
-      href: "https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap",
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap',
     },
   ];
 };
 
 export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Software Pato Developer",
-  viewport: "width=device-width,initial-scale=1",
+  charset: 'utf-8',
+  title: 'Software Pato Developer',
+  viewport: 'width=device-width,initial-scale=1',
 });
 
 interface DocumentProps {
@@ -63,7 +63,7 @@ const Document = withEmotionCache(
           {serverStyleData?.map(({ key, ids, css }) => (
             <style
               key={key}
-              data-emotion={`${key} ${ids.join(" ")}`}
+              data-emotion={`${key} ${ids.join(' ')}`}
               dangerouslySetInnerHTML={{ __html: css }}
             />
           ))}
@@ -76,7 +76,7 @@ const Document = withEmotionCache(
         </body>
       </html>
     );
-  }
+  },
 );
 
 export default function App() {
