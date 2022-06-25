@@ -14,6 +14,7 @@ import { ServerStyleContext, ClientStyleContext } from '@styles/styles-context';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import theme from '@styles/theme';
 import Navbar from '@components/navbar';
+import Providers from './utils/providers';
 
 export let links: LinksFunction = () => {
   return [
@@ -82,11 +83,11 @@ const Document = withEmotionCache(
 export default function App() {
   return (
     <Document>
-      <ChakraProvider theme={theme}>
+      <Providers>
         <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <Navbar />
         <Outlet />
-      </ChakraProvider>
+      </Providers>
     </Document>
   );
 }
