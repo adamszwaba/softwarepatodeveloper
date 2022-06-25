@@ -1,7 +1,7 @@
-import { json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
-import type { ArticlesLoaderReturnType } from "./articles/index";
-import { getArticlesData } from "./articles/index";
+import { json } from '@remix-run/node';
+import { Link, useLoaderData } from '@remix-run/react';
+import type { ArticlesLoaderReturnType } from './articles/index';
+import { getArticlesData } from './articles/index';
 
 export async function loader() {
   return json<ArticlesLoaderReturnType>({ articles: await getArticlesData() });
