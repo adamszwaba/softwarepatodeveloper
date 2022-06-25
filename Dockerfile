@@ -22,6 +22,7 @@ WORKDIR /myapp
 
 COPY --from=deps /myapp/node_modules /myapp/node_modules
 ADD package.json yarn.lock ./
+RUN yarn install --production
 
 # Build the app
 FROM base as build
